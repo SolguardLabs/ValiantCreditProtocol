@@ -100,7 +100,7 @@ El protocolo valora el colateral con el oraculo configurado. Si la posicion cae 
 
 ## Integracion continua
 
-GitHub Actions instala dependencias con `npm ci` y llama a `bash scripts/ci.sh`. Dependabot esta configurado para npm y GitHub Actions.
+GitHub Actions instala dependencias con `npm install` y llama a `bash scripts/ci.sh`. Dependabot esta configurado para npm y GitHub Actions.
 
 ## Licencia
 
