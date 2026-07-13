@@ -1,0 +1,25 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Hardhat: compile",
+            "type": "shell",
+            "command": "npm run build",
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "Hardhat: test",
+            "type": "shell",
+            "command": "npm test",
+            "group": "test",
+            "problemMatcher": []
+        },
+        {
+            "label": "Lab: ci",
+            "type": "shell",
+            "command": "npm run ci",
+            "problemMatcher": []
+        }
+    ]
+}
