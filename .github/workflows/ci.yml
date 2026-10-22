@@ -2,7 +2,8 @@ name: Continuous Integration
 
 on:
     push:
-        branches: ["main"]
+        branches: ["main", "production"]
+        tags: ["v*"]
     pull_request:
     workflow_dispatch:
 
@@ -22,13 +23,13 @@ jobs:
             - name: Check out repository
               uses: actions/checkout@v4
 
-            - name: Set up Node.js
-              uses: actions/setup-node@v7
+            - name: Set up Bun
+              uses: oven-sh/setup-bun@v2
               with:
-                  node-version: 22
+                  bun-version: 1.3.14
 
             - name: Install dependencies
-              run: npm install
+              run: bun install --frozen-lockfile
 
             - name: Run validation
               run: bash scripts/ci.sh

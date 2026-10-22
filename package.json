@@ -2,17 +2,19 @@
     "name": "valiant-credit-protocol",
     "version": "1.0.0",
     "private": true,
-    "description": "Delegated credit protocol lab for local Hardhat testing.",
+    "description": "Mercado de crédito delegado con rutas directas y administradas.",
     "scripts": {
         "build": "hardhat compile",
         "test": "hardhat test",
         "test:trace": "hardhat test --show-stack-traces",
         "loc": "bash scripts/check-loc.sh",
-        "ci": "npm run build && npm test && bash scripts/check-loc.sh",
-        "fmt": "prettier --write .prettierignore '**/*.{ts,js,json,yml}'"
+        "ci": "bash scripts/ci.sh",
+        "fmt": "prettier --write client tests package.json README.md SECURITY.md docs .github",
+        "fmt:check": "prettier --check client tests package.json README.md SECURITY.md docs .github"
     },
     "devDependencies": {
         "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-        "hardhat": "^2.26.0"
+        "hardhat": "^2.26.0",
+        "prettier": "^3.6.2"
     }
 }

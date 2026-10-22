@@ -1,5 +1,6 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
+const { ValiantPositionClient } = require("../client/ValiantPositionClient");
 
 const WAD = ethers.parseEther("1");
 const PRICE_1 = 100000000n;
@@ -66,6 +67,26 @@ describe("ValiantCreditProtocol", function () {
         expect(account.collateral).to.equal(units("1000"));
         expect(account.debt).to.equal(units("150"));
         expect(await protocol.borrowerDebt(bob.address)).to.equal(units("150"));
+    });
+
+    it("prepares a bounded direct-line borrowing view", async function () {
+        const { alice, bob, protocol } = await deployFixture();
+        await protocol.connect(alice).deposit(units("1000"), alice.address);
+        await protocol
+            .connect(alice)
+            .delegateCredit(bob.address, units("400"), 0, true, ethers.id("client-view"));
+        await protocol.connect(bob).borrow(alice.address, units("150"), bob.address);
+
+        const client = new ValiantPositionClient(protocol);
+        const view = await client.inspectDirect(alice.address, bob.address);
+        expect(view.borrowCapacity).to.equal(units("750"));
+        expect(view.availableCredit).to.equal(units("600"));
+        expect(view.lineRemaining).to.equal(units("250"));
+        expect(view.executableNow).to.equal(units("250"));
+
+        await protocol.connect(alice).revokeDelegation(bob.address);
+        const revoked = await client.inspectDirect(alice.address, bob.address);
+        expect(revoked.executableNow).to.equal(0n);
     });
 
     it("enforces delegated limits on direct borrowing", async function () {
