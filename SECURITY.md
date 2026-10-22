@@ -1,61 +1,33 @@
-# Politica de seguridad
+# Seguridad
 
-ValiantCreditProtocol mantiene un proceso coordinado para revisar hallazgos que afecten a los contratos, scripts y herramientas de este repositorio.
+## Superficie y garantías
 
-## Alcance
+El alcance técnico comprende contratos bajo `src/`, integraciones de oráculo y tipos, scripts de validación y cliente de lectura. Las líneas exponen límites, caducidad y revocación; los préstamos comprueban liquidez, capacidad, límites de mercado y estado de pausa. Los repagos y liquidaciones deben conservar la coherencia de ruta, prestatario, cuenta de exposición y deuda total.
 
-Estan dentro del alcance:
-
-- contratos bajo `src/`;
-- depositos, retiros y contabilidad de deuda;
-- autorizaciones de credito delegado;
-- rutas de prestamo administradas por managers;
-- repagos, revocaciones y liquidaciones;
-- oraculos, modelos de tipos, motores de riesgo y lentes;
-- scripts de despliegue y validacion mantenidos en el repositorio.
-
-Normalmente quedan fuera del alcance:
-
-- interfaces de terceros no incluidas aqui;
-- parametros de despliegue modificados fuera de las recomendaciones del proyecto;
-- credenciales, RPCs o servicios externos comprometidos;
-- copias alteradas por integradores.
-
-## Invariantes esperadas
-
-- Ninguna cuenta debe retirar colateral que respalde deuda abierta.
-- Las lineas de credito deben respetar limites, expiracion y revocacion.
-- Los repagos deben reducir deuda de ruta, deuda de borrower y exposicion contable.
-- Las liquidaciones solo deben ejecutarse sobre cuentas por debajo del umbral configurado.
-- Los precios usados para admision y liquidacion deben ser validos y recientes.
-- Las reservas acumuladas no deben mezclarse con liquidez disponible para retiros ordinarios.
-
-## Comunicacion privada
-
-Informe los hallazgos por el canal privado indicado por los mantenedores. Incluya:
-
-- componente afectado;
-- commit o version;
-- condiciones previas;
-- impacto tecnico y economico;
-- pasos de reproduccion minimos;
-- pruebas, trazas o transacciones relevantes;
-- mitigaciones temporales si existen.
-
-No publique detalles tecnicos en canales publicos antes de coordinar una respuesta. No comparta claves privadas ni credenciales.
-
-## Proceso
-
-El equipo buscara acusar recibo en dos dias laborables, triage inicial en cinco dias laborables y actualizaciones semanales mientras el analisis continue. La prioridad se asigna segun fondos en riesgo, permisos requeridos, reproducibilidad y alcance.
-
-## Validacion local
-
-Antes de reportar, ejecute cuando sea posible:
-
-```bash
-npm run build
-npm test
-bash scripts/check-loc.sh
+```mermaid
+flowchart TD
+    TX[Solicitud de préstamo] --> A{Autorización y vigencia}
+    A -->|válida| L{Límite de línea}
+    L -->|suficiente| O{Precio válido y reciente}
+    O -->|sí| C{Capacidad y liquidez}
+    C -->|sí| U[Actualizar deuda y transferir]
+    A -->|no| X[Revertir]
+    L -->|no| X
+    O -->|no| X
+    C -->|no| X
 ```
 
-Los resultados locales ayudan a separar problemas de entorno de defectos del protocolo.
+El cliente de lectura ofrece una estimación puntual; la ejecución debe repetir las comprobaciones. Los administradores de riesgo pueden cambiar parámetros y dependencias: esas facultades requieren revisión de configuración y separación de claves. Este repositorio no acredita una auditoría ni un despliegue externo.
+
+## Comunicación responsable
+
+Utilice la opción privada **Report a vulnerability** de GitHub si está habilitada; si no, contacte a los mantenedores por un canal privado antes de publicar detalles. Incluya commit, componente, condiciones iniciales, transiciones reproducibles, impacto económico medido y pruebas que distingan lo esperado de lo no autorizado. No envíe secretos ni datos de terceros.
+
+Los informes se priorizan por impacto reproducible, permisos necesarios y posibilidad de mitigación. No se prometen plazos ni recompensas no publicados. Una prueba local no demuestra exposición de fondos en una red externa.
+
+```bash
+bun install --frozen-lockfile
+bash scripts/ci.sh
+```
+
+Consulte [operación y controles](./docs/operacion.md) para las referencias de entrega.
